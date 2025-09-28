@@ -6,6 +6,7 @@ import sys
 
 from boid import Boid
 from barrier import Barrier
+from flock import Flock
 
 # Initialize Pygame
 pygame.init()
@@ -24,12 +25,8 @@ FPS = 60
 
 clock = pygame.time.Clock() # To control frame rate
 
-boids = []
-for i in range(100):
-    pos = np.random.rand(2) * [WIDTH, HEIGHT]
-    velocity = (np.random.rand(2) - 0.5) * 20
-    acceleration = np.zeros(2)
-    boids.append(Boid(pos, velocity, acceleration, (WIDTH, HEIGHT)))
+# Create flock
+flock = Flock(num_boids=200, screen_size=(WIDTH, HEIGHT))
 
 barriers = []
 
@@ -43,22 +40,16 @@ while True:
         mouse_pos = pygame.mouse.get_pos()
         barriers.append(Barrier(np.array(mouse_pos)))
 
-    for boid in boids:
-        boid.flock(boids)
-        if len(barriers) > 0:
-            boid.separation(barriers)
+    # Update flocks positions
+    flock.update()
 
     # Drawing
     screen.fill(BLACK) # Fill the background
-    for boid in boids:
-        boid.update()
-        boid.draw(screen)
-
-    for barrier in barriers:
-        barrier.draw(screen)
+    
+    flock.draw(screen)
 
     # Update the display
     pygame.display.flip() # Or pygame.display.update() for partial updates
 
     # Control frame rate
-    clock.tick(FPS) # Limits the game to 30 frames per second
+    clock.tick(FPS) # Limits the game FPS
